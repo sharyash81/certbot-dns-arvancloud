@@ -4,7 +4,7 @@ A ArvanCloud helper class to wrap the API relevant for the functionality in this
 import json
 import requests
 
-ARVANCLOUD_API_ENDPOINT = 'https://napi.arvancloud.com/cdn/4.0/domains/'
+ARVANCLOUD_API_ENDPOINT = 'https://napi.arvancloud.ir/cdn/4.0/domains/'
 
 
 class _ArvanCloudException(Exception):
