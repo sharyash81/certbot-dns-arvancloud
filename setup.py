@@ -25,9 +25,9 @@ setup(
     description="ArvanCloud DNS Authenticator plugin for Certbot",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/sijad/certbot-dns-arvancloud",
-    author="Sajjad Hashemian",
-    author_email="hi@hashemian.me",
+    url="https://github.com/sharyash81/certbot-dns-arvancloud",
+    author="Arya Shahsavar",
+    author_email="sharyash81@gmail.com",
     license="Apache License 2.0",
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*',
     classifiers=[
