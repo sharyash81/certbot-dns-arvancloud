@@ -12,7 +12,8 @@ from certbot_dns_arvancloud.arvancloud_client import \
     _ArvanCloudClient, \
     _NotAuthorizedException
 
-TTL = 60
+TTL = 120
+PREFIX = "_acme-challenge"
 
 
 @zope.interface.implementer(interfaces.IAuthenticator)
@@ -51,7 +52,7 @@ class Authenticator(dns_common.DNSAuthenticator):
             self._get_arvancloud_client().add_record(
                 domain,
                 "TXT",
-                self._fqdn_format(validation_name),
+                PREFIX,
                 validation,
                 TTL,
                 False
@@ -65,7 +66,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _cleanup(self, domain, validation_name, validation):
         try:
-            self._get_arvancloud_client().delete_record_by_name(domain, self._fqdn_format(validation_name))
+            self._get_arvancloud_client().delete_record_by_name(domain,PREFIX)
         except (requests.ConnectionError, _NotAuthorizedException) as exception:
             raise errors.PluginError(exception)
 
