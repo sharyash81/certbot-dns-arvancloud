@@ -4,8 +4,7 @@ A ArvanCloud helper class to wrap the API relevant for the functionality in this
 import json
 import requests
 
-ARVANCLOUD_API_ENDPOINT = 'https://napi.arvancloud.ir/cdn/4.0/domains/'
-
+ARVANCLOUD_API_ENDPOINT = 'https://napi.arvancloud.ir/cdn/4.0/domains'
 
 class _ArvanCloudException(Exception):
     pass
@@ -43,6 +42,8 @@ class _ArvanCloudClient:
     @property
     def _headers(self):
         return {
+            "authority": "napi.arvancloud.ir",
+            "accept": "application/json, text/plain, */*",
             "Content-Type": "application/json",
             "Authorization": self.token,
         }
@@ -65,19 +66,27 @@ class _ArvanCloudClient:
             url="{0}/{1}/dns-records".format(ARVANCLOUD_API_ENDPOINT, domain),
             headers=self._headers,
             data=json.dumps({
-                "type": record_type,
-                "name": name,
-                "value": value,
-                "ttl": ttl,
-                "cloud": cloud
-            })
-        )
+                    "type": record_type,
+                    "name": name,
+                    "value": {
+                        "text": value 
+                    },
+                    "ttl": ttl,
+                    "cloud": cloud,
+                    "upstream_https": "default",
+                    "ip_filter_mode": {
+                        "count": "single",
+                        "geo_filter": "none",
+                            "order": "none"
+                    }
+                }))
+        
         if create_record_response.status_code == 401:
-            raise _NotAuthorizedException()
+           raise _NotAuthorizedException()
         try:
-            return create_record_response.json()
+           return create_record_response.json()   
         except (ValueError, UnicodeDecodeError) as exception:
-            raise _MalformedResponseException(exception)
+           raise _MalformedResponseException(exception)
 
     def delete_record_by_name(self, domain, record_name):
         """
