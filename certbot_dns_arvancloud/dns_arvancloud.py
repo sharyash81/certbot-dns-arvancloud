@@ -13,8 +13,6 @@ from certbot_dns_arvancloud.arvancloud_client import \
     _NotAuthorizedException
 
 TTL = 120
-PREFIX = "_acme-challenge"
-
 
 @zope.interface.implementer(interfaces.IAuthenticator)
 @zope.interface.provider(interfaces.IPluginFactory)
@@ -50,9 +48,9 @@ class Authenticator(dns_common.DNSAuthenticator):
     def _perform(self, domain, validation_name, validation):
         try:
             self._get_arvancloud_client().add_record(
-                domain,
+                Authenticator._domain_extractor(domain),
                 "TXT",
-                PREFIX,
+                Authenticator._subdomain_extractor(validation_name),
                 validation,
                 TTL,
                 False
@@ -66,7 +64,7 @@ class Authenticator(dns_common.DNSAuthenticator):
 
     def _cleanup(self, domain, validation_name, validation):
         try:
-            self._get_arvancloud_client().delete_record_by_name(domain,PREFIX)
+            self._get_arvancloud_client().delete_record_by_name(domain,Authenticator._subdomain_extractor(validation_name))
         except (requests.ConnectionError, _NotAuthorizedException) as exception:
             raise errors.PluginError(exception)
 
@@ -80,3 +78,19 @@ class Authenticator(dns_common.DNSAuthenticator):
         if not name.endswith('.'):
             return '{0}.'.format(name)
         return name
+    
+    @staticmethod
+    def _domain_extractor(subdomain):
+        parts = subdomain.split('.')
+        if len(parts) >= 2:
+            return '.'.join(parts[-2:])
+        else:
+            return subdomain 
+    @staticmethod
+    def _subdomain_extractor(fqdn):
+        parts = fqdn.split('.')
+        if len(parts) > 2:
+            return '.'.join(parts[:-2])
+        else:
+            return ''
+
